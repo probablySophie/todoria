@@ -1,0 +1,7 @@
+[package]
+name = "todoria"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+todo-txt = {git = "https://github.com/probablySophie/todo-txt-rs"}
