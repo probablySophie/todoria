@@ -1,16 +1,65 @@
 # ToDoria
 
-A TUI todo app!  Uses the [todo.txt](https://github.com/todotxt/todo.txt) spec via [`todo-txt-rs`](https://github.com/probablySophie/todo-txt-rs) & [`ratatui`](https://github.com/ratatui/ratatui) for the visuals.
+A TUI todo app!  Uses the [todo.txt](https://github.com/todotxt/todo.txt) spec via [`todo-txt-rs`](https://github.com/probablySophie/todo-txt-rs) & [`ratatui`](https://github.com/ratatui/ratatui) for the visuals.  
 
 ****
 
+### Using...
+
+**Ratatui**  
+
+* [Blocks](https://ratatui.rs/showcase/widgets#block)  
+* [Calendar](https://ratatui.rs/showcase/widgets#calendar)!!!  
+* [Gauge](https://ratatui.rs/showcase/widgets/#gauge)? For sub-task completion  
+* [Table](https://ratatui.rs/showcase/widgets/#table) for lists of tasks!  
+* [Tabs](https://ratatui.rs/showcase/widgets/#tabs)!!  
+* [Making Custom Widgets](https://ratatui.rs/recipes/widgets/custom/)  
+
+3rd party
+
+* [Menus!](https://ratatui.rs/showcase/third-party-widgets#tui-menu--)?  
+* [Scroll-view](https://ratatui.rs/showcase/third-party-widgets#tui-scrollview--)?  
+
+***
+
+### Plans!
+
+Bottom Menu Options:  
+
+```
+<Enter> Select | <F> Filter | <S> Sort | <?> Settings/Keys | <Q> Quit
+```
+
+Open straight into a table view of the current Todo items.
+
+**Settings**
+
+> * Hotkeys  
+> * Default filters & sorting  
+> * Load  
+> * Auto-load? (and what to)
+> * Save  
+> * Auto-save? (and where to)
+
+**Filter** and **Sort**  
+
+> Open menus with *clear* and the filter & sorting options.  
+
+**Quit**
+
+> If there have been changes, opens a *would you like to save your changes?*
 
 
 
-##### What's in a name?
+Arrow keys & `HJKL` vim movement.  
+
+
+****
+
+### What's in a name?
 
 ![A photo of a Tyler's Tree Frog!!!](/meta/freg.jpg)  
-*Source: [Wikipedia](https://en.wikipedia.org/wiki/File:Litoria_tyleri.jpg)*
+*Source: [Wikipedia](https://en.wikipedia.org/wiki/File:Litoria_tyleri.jpg)*  
 
 This little cutie is a [Tyler's Tree Frog](https://en.wikipedia.org/wiki/Tyler%27s_tree_frog)!  
 Its scientific name is `Litoria tyleri` and climbs trees in eastern Australia!  
@@ -18,8 +67,7 @@ Its scientific name is `Litoria tyleri` and climbs trees in eastern Australia!
 And how the project's name happened:  
 ```
 Litoria
-Li toria
-   to ria
-   to  ria
-   todoria
+  toria
+  ^todo
+  todoria
 ```
