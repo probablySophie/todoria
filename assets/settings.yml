@@ -1,0 +1,9 @@
+All: {
+  Quit: ['Q'],
+  Up: ['Up', 'K'],
+  Down: ['Down', 'J'],
+  Left: ['Left', 'H'],
+  Right: ['Right', 'L'],
+  Select: ['Enter'],
+  Close: ['Esc'],
+ }
