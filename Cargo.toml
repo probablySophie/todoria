@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-todo-txt = {git = "https://github.com/probablySophie/todo-txt-rs"}
+crossterm = "0.28.1"
+ratatui = "0.28.1"
+todo-txt-rs = {git = "https://github.com/probablySophie/todo-txt-rs"}
