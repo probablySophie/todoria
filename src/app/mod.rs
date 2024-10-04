@@ -4,3 +4,4 @@ mod app;
 pub use app::*;
 
 mod keybinds;
+mod todos;

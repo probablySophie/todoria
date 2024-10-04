@@ -9,7 +9,7 @@ pub enum State
     Settings,
     Filter,
     Sort,
-    All, // Required (for keybinds::KeyBind::matches)
+    All, // Required (for keybinds::KeyBind::matches) [[keybinds.rs]]
 }
 impl State
 {
