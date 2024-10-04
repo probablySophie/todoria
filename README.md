@@ -6,7 +6,7 @@ A TUI todo app!  Uses the [todo.txt](https://github.com/todotxt/todo.txt) spec v
 
 ### Using...
 
-**Ratatui**  
+**Ratatui** [Widgets](https://ratatui.rs/examples/widgets/)  
 
 * [Blocks](https://ratatui.rs/showcase/widgets#block)  
 * [Calendar](https://ratatui.rs/showcase/widgets#calendar)!!!  
