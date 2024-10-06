@@ -1,11 +1,11 @@
 use std::io;
-use crossterm::event::{self};
+use crossterm::event;
 use todo_txt_rs::Todo;
 
 use super::keybinds;
 
 #[path = "../tests/app.rs"] mod test    ;
-#[path = "render.rs"]       mod render  ;
+#[path = "render/mod.rs"]   mod render  ;
 #[path = "state.rs"]        mod state   ; pub use state::State;
 #[path = "action.rs"]       mod action  ; pub use action::Action;
 #[path = "settings.rs"]     mod settings;
@@ -17,12 +17,19 @@ pub struct App
     title: &'static str,
     exit: bool,
     unsaved_changes: bool,
+    
     state: State,                     // [[state.rs]]
     previous_state: State,
+    
     keybinds: Vec<keybinds::KeyBind>, // [[keybinds.rs]]
+    
     current_view: Vec<Todo>,
     loaded_todos: Vec<Todo>,          // [[todos.rs]]
+    
     settings: settings::Settings,     // [[settings.rs]]
+    debug_info: String,               // Printed if crate::DEBUG is true
+
+    instructions: ratatui::text::Line<'static> // The instructions & keybinds to display
 }
 
 impl Default for App
@@ -40,6 +47,8 @@ impl Default for App
             current_view: Vec::new(),
             loaded_todos: Vec::new(),
             settings: settings::Settings::default(),
+            debug_info: String::new(),
+            instructions: ratatui::text::Line::from(""),
         }
     }
 }
@@ -48,21 +57,33 @@ impl Default for App
 impl App
 {
     /// Our App's main while loop that draws, handles, events, & quits when done
-    pub fn run(&mut self, mut terminal: ratatui::DefaultTerminal) -> io::Result<()>
+    pub fn run(&mut self, mut terminal: ratatui::DefaultTerminal) -> io::Result<String>
     {
         self.setup();
-                
+        self.change_state(State::Main);
+        
     	while !self.exit
     	{
     		terminal.draw(|frame| {self.draw(frame)})?;
             self.handle_events()?;
     	}
-    	Ok (()) // Return Ok(())
+
+    	Ok (self.debug_info.clone()) // Return Ok(())
     }
 
     fn setup(&mut self)
-    {        
-        // TODO: Load settings  [[settings.rs]]
+    {
+        // Load settings using Confy [[settings.rs]]
+        if let Ok(loaded_settings) = confy::load("Todoria", None)
+        {
+            self.settings = loaded_settings;
+            if crate::DEBUG {self.debug_info += "Successfully loaded settings\n"};
+        }
+        else if crate::DEBUG
+        {
+            self.debug_info += "Failed to load settings\n";
+        }
+        // Else we'll get the default settings
         
         // If we're saving multiple files
         if self.settings.save_seperate_by_project
@@ -73,7 +94,16 @@ impl App
         else // Else
         {
             // Just load one file thank you
-            self.loaded_todos = crate::app::todos::load(&self.settings.save_path);
+            if let Ok(loaded) = crate::app::todos::load(&self.settings.save_path)
+            {
+                self.loaded_todos = loaded;
+            }
+        }
+
+        if crate::DEBUG
+        {
+            self.debug_info += "loaded '";
+            self.debug_info += &(self.loaded_todos.len().to_string() + "' Todo items");
         }
     }
 
@@ -109,6 +139,7 @@ impl App
         self.do_the_thing(current_action);
     }
 
+    /// Do whatever action we've got
     fn do_the_thing(&mut self, action: Action)
     {
         match action
@@ -116,6 +147,8 @@ impl App
             Action::None => { /* Do nothing :) */ },
             Action::Quit => self.exit(),
             Action::Close => self.change_state(State::Main),
+            Action::Save => self.save(),
+            Action::Select => self.change_state(State::All), //TEMP
             _ => { todo!() },
         }
     }
@@ -135,15 +168,41 @@ impl App
         }
     }
 
-    /// Update the app's `self.state`, also sets `self.previous_state`
-    fn change_state(&mut self, state: State)
+    /// Attempt to save all our loaded todo items
+    fn save(&mut self)
     {
-        self.previous_state = self.state;
-        self.state = state;
-        
-        // TODO: The drawn instructions string should be constructed here
-        //       Using the actions we want to always display, and the matching
-        //       KeyBind's KeyCodes
+        // Are we saving everything seperately?
+        let success:bool = if self.settings.save_seperate_by_project
+            {
+                crate::app::todos::save_seperate(
+                    &self.settings.save_path, 
+                    self.loaded_todos.clone()
+                )
+            }
+            else
+            {
+                crate::app::todos::save(
+                    &self.settings.save_path, 
+                    self.loaded_todos.clone()
+                )
+            };
+
+        if success
+        {
+            self.unsaved_changes = false;
+        }
+
+        if crate::DEBUG
+        {
+            if success
+            {
+                self.debug_info += "Successfully saved todo items\n";
+            }
+            else
+            {
+                self.debug_info += "Failed to save todo items\n";
+            }
+        }
     }
 }
 
