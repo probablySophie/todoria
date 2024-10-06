@@ -1,10 +1,10 @@
-// TODO: 
-//use serde_derive::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize};
+
 
 // Use Confy? https://docs.rs/confy/latest/confy/index.html ??
 // Confy ONLY does configs, not saving anything else
 
-#[derive(Debug)] // Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Settings
 {
 	//TODO: Keybinds
@@ -17,11 +17,21 @@ impl Default for Settings
 {
 	fn default() -> Self
 	{
-        Settings
-        {
-        	save_path: String::from(""), // dirs::data_dir() + "/sophie.coffee/todo/"
-        	save_seperate_by_project: false,
-        }
+		let mut settings = Settings
+	    {
+	    	save_path: String::new(),
+	    	save_seperate_by_project: false,
+	    };
+				
+		if let Some(data_dir) = dirs::data_dir()
+		{
+			if let Some(path) = data_dir.as_path().to_str()
+			{
+				settings.save_path = crate::shared::files::safe_directory(path) + "sophie.coffee/todoria/";
+			}
+	    }
+
+	    settings // Return our settings
     }
 }
 
