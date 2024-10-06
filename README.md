@@ -22,6 +22,20 @@ A TUI todo app!  Uses the [todo.txt](https://github.com/todotxt/todo.txt) spec v
 
 ***
 
+### Direct Dependencies
+
+|Name|Size|Usage|
+|-|-|-|
+|`todo-txt-rs`||Handles the `todo.txt` items & stuff|
+|[`Confy`](https://crates.io/crates/confy)|16.3 KiB|Config creation, loading, and saving|
+|[`serde`](https://crates.io/crates/serde)|54.7 KiB|`Confy` dependency|
+|`ratatui`||The TUI|
+|`crossterm`||`ratatui` backend|
+|[`dirs`](https://crates.io/crates/dirs)|12 KiB|Cross-platform directories|
+
+
+****
+
 ### Plans!
 
 Bottom Menu Options:  
