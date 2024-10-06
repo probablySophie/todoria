@@ -12,7 +12,7 @@ pub struct KeyBind
     // The action that gets called, this one doesn't change
     action: Action,
     // The states that the KeyBind applies to
-    states: Vec<State>,
+    state: State,
 }
 impl KeyBind
 {
@@ -26,29 +26,25 @@ impl KeyBind
 		}
 		// Else
 		
-		// For each of the current KeyBind's states
-		for s in &self.states
+		// If the state matches the input state
+		// Or the state is ALL (you know.  Matching all of them)
+		if &self.state == &state || &self.state == &State::All
 		{
-			// If the state matches the input state
-			// Or the state is ALL (you know.  Matching all of them)
-			if s == &state || s == &State::All
-			{
-				// Then we're happy :)
-				return true
-			}
+			// Then we're happy :)
+			return true
 		}
 		// Else we don't match
 		false // Return false
 	}
 
 	/// Make a single new keybind
-	pub fn new(key: crossterm::event::KeyCode, action: Action, states: Vec<State>) -> Self
+	pub fn new(key: crossterm::event::KeyCode, action: Action, state: State) -> Self
 	{
 		KeyBind
 		{
 			key,
 			action,
-			states
+			state
 		}
 	}
 
@@ -67,7 +63,7 @@ impl KeyBind
 		{
 			key:    crossterm::event::KeyCode::Null, // TODO: this
 			action: Action::from_string(action).unwrap(),
-			states: vec![State::from_string(state).unwrap()],
+			state: State::from_string(state).unwrap(),
 		}
 		
 		// TODO: Make a keybind from the state, action, and keycode
@@ -93,6 +89,23 @@ pub fn get_action(keybinds: &Vec<KeyBind>, keycode: crossterm::event::KeyCode, c
 	Action::None //Ok(Action::None)
 }
 
+pub fn char_from_action(keybinds: &Vec<KeyBind>, action: Action, state: State) -> String
+{
+	for keybind in keybinds
+	{
+		if keybind.action == action && (keybind.state == state || keybind.state == State::All)
+		{
+			if let crossterm::event::KeyCode::Char(key) = keybind.key
+			{
+				return key.to_string()
+			}
+			// Else
+			return keybind.key.to_string()
+		}
+	}
+	// Else
+	String::new() // Return ""
+}
 
 pub fn default_vec() -> Vec<KeyBind>
 {
@@ -102,37 +115,37 @@ pub fn default_vec() -> Vec<KeyBind>
         KeyBind::new( // Make sure we can quit
             crossterm::event::KeyCode::Char('Q'),
             Action::Quit,
-            vec![State::All],
+            State::All,
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Up,
         	Action::Up,
-        	vec![State::All],
+        	State::All,
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Down,
         	Action::Down,
-        	vec![State::All],
+        	State::All,
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Left,
         	Action::Left,
-        	vec![State::All],
+        	State::All,
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Right,
         	Action::Right,
-        	vec![State::All],
+        	State::All,
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Enter,
         	Action::Select,
-        	vec![State::All],
+        	State::All,
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Esc,
         	Action::Close,
-        	vec![State::All],
+        	State::All,
         )
     ]
 }
