@@ -23,38 +23,49 @@ pub fn load(file_path: &str) -> io::Result<Vec<Todo>>
 	)
 }
 
-pub fn load_all(file_path: &str)// -> Vec<Todo>
+pub fn load_all(file_path: &str) -> Vec<Todo>
 {
-	// TODO: 1. Get all .txt files in the given dir
-	//       2. For each, call load()
-	//       3. Combine the responses
+	let mut vec_todo = Vec::new();
 	
+	if let Ok(contents_vec) = files::read_all(file_path)
+	{
+		for contents in contents_vec
+		{
+			vec_todo.append( &mut todo_txt_rs::bulk_create(&contents) );
+		}
+	}
+	
+	vec_todo
 }
 
 pub fn save(file_path: &str, todo_vec: Vec<Todo>) -> bool
 {
-	let string = todo_txt_rs::flatten_vec(todo_vec);
+	//TODO: Call files::recursive_mkdir();
 
-	// TODO: Save the string to the file_path
-
-	false
+	files::write(file_path, &todo_txt_rs::flatten_vec(todo_vec))
 }
 
-pub fn save_seperate(file_path: &str, todo_vec: Vec<Todo>) -> bool
+pub fn save_seperate(directory_path: &str, todo_vec: Vec<Todo>) -> bool
 {
+	//TODO: Call files::recursive_mkdir();
+	let directory_path = files::safe_directory(directory_path);
+	
 	let mut success = true;
 	let projects = todo_txt_rs::info::get_projects(&todo_vec);
 
 	for project in projects
 	{
-		// TODO: 1. Filter the todo_vec by that project
-		//       2. this_success = save(file_path + "/" + project + ".txt", filtered)
-		//       3. success = success && this_success // false if either value is false
+		let save_vec = todo_txt_rs::filter::project(&todo_vec, &project);
+
+		// Set success to false if:
+		//     Success was already false
+		//     We failed to save this set of Todo items
+		success = success && files::write(
+			&( (directory_path.clone() + &project) + ".txt"),
+			&todo_txt_rs::flatten_vec(save_vec)
+		);
 	}
 
 	success
 }
-
-// TODO: save(file_path) -> bool
-
 
