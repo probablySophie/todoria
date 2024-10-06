@@ -1,6 +1,6 @@
 use std::io;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Action
 {
     None, // Required (for keybinds::KeyBind::matches)
@@ -13,6 +13,7 @@ pub enum Action
 
     Select, // Select the currently hovered item
     Close,  // Close any popups or go back to the main display
+    Save,
 }
 
 
