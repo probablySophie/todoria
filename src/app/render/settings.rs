@@ -2,6 +2,9 @@
 /*
 	Use Tabs for the different types of settings (filter, sort, settings)
 	https://docs.rs/ratatui/latest/ratatui/widgets/struct.Tabs.html
+
+	Have a table of the settings & their values
+	https://docs.rs/ratatui/latest/ratatui/widgets/struct.Table.html
 */
 
 
