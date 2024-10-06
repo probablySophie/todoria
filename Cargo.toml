@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+confy = "0.6.1"
 crossterm = "0.28.1"
+dirs = "5.0.1"
 ratatui = "0.28.1"
+serde = {version = "1.0.210", features = ["derive"]}
 todo-txt-rs = {git = "https://github.com/probablySophie/todo-txt-rs"}
