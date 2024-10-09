@@ -14,6 +14,7 @@ pub struct KeyBind
     // The states that the KeyBind applies to
     state: State,
 }
+
 impl KeyBind
 {
 	/// Check if the current `KeyBind` matches a given `KeyCode` and `app::State`
@@ -28,7 +29,7 @@ impl KeyBind
 		
 		// If the state matches the input state
 		// Or the state is ALL (you know.  Matching all of them)
-		if &self.state == &state || &self.state == &State::All
+		if self.state == state || self.state == State::All
 		{
 			// Then we're happy :)
 			return true
@@ -63,7 +64,7 @@ impl KeyBind
 		{
 			key:    crossterm::event::KeyCode::Null, // TODO: this
 			action: Action::from_string(action).unwrap(),
-			state: State::from_string(state).unwrap(),
+			state:  State::from_string(state).unwrap(),
 		}
 		
 		// TODO: Make a keybind from the state, action, and keycode
@@ -146,7 +147,12 @@ pub fn default_vec() -> Vec<KeyBind>
         	crossterm::event::KeyCode::Esc,
         	Action::Close,
         	State::All,
-        )
+        ),
+        KeyBind::new(
+        	crossterm::event::KeyCode::Char('S'),
+        	Action::Save,
+        	State::Main,
+        ),
     ]
 }
 
