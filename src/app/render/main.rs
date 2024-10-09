@@ -1,9 +1,81 @@
-use ratatui::{layout::Constraint, prelude::{Buffer, Rect}, style::{Style, Stylize}, widgets::{self, Block, Widget}};
+use ratatui::{style::Stylize, text::Line, widgets::{self, block::Title, Block}, Frame};
 
-use crate::app::{App, State};
+use crate::app::State;
 
+use super::{hello_world::HelloWorld, table::TableContainer};
+
+#[derive(Debug)]
+pub struct Screens<'a>
+{
+    // The block, so it can update
+    pub block: Block<'a>,
+    
+    pub todo_table: TableContainer<'a>,
+    pub hello_world: HelloWorld<'a>,
+}
+impl<'a> Screens<'a>
+{
+    pub fn new(title: &str) -> Self
+    {
+        let title = widgets::block::Title::from(title.to_owned().bold());
+                
+        let block = Self::block( Title::from("") );        
+        Screens
+        {
+            block,
+            todo_table: TableContainer::new(),
+            hello_world: HelloWorld::new("Hello World!"),
+        }
+    }
+
+    fn block(instructions: Title) -> Block
+    {
+        Block::bordered()
+            .title(
+                Title::from(crate::TITLE.to_owned().bold())
+            )
+            .title(instructions
+                .alignment(ratatui::layout::Alignment::Center)
+                .position(widgets::block::Position::Bottom)
+            )
+            .border_set(ratatui::symbols::border::ROUNDED)
+            //.style(Style::new().blue())
+    }
+
+    pub fn update_instructions(&mut self, instructions: Line<'a>)
+    {
+        self.block = Self::block(instructions.into());
+    }
+
+    pub fn render(&mut self, frame: &mut Frame, state: crate::app::State)
+    {
+        let block = self.block.clone();
+        match state
+        {
+            State::Main           => self.todo_table.render(frame, block),
+            State::Focused        => todo!(),
+            State::UnsavedChanges => todo!(),
+            State::Filter         => todo!(),
+            State::Sort           => todo!(),
+            State::Settings       => todo!(),
+            State::All            => self.hello_world.render(frame, block), 
+            // State::All should eventually be unreachable
+        }
+    }
+}
+
+/*
 impl App
 {
+    pub fn draw(&self, frame: &mut Frame)
+    {
+        // TODO: Update all the below draw functions to actually take a Frame
+        //       And call frame.render_widget or frame.render_stateful_widget
+        //       with the widget that they're for e.g.
+        //       frame.render_stateful_widget(table, frame.area(), &mut table_state)
+        frame.render_widget(self, frame.area());
+    }
+    
     fn draw_main(&self, area: Rect, buf: &mut Buffer, block: Block)
     {
         // A table  | https://docs.rs/ratatui/latest/ratatui/widgets/struct.Table.html
@@ -107,26 +179,14 @@ impl App
 
     fn draw_hello_world(area: Rect, buf: &mut Buffer, block: Block)
     {
-        let text = ratatui::text::Text::from(
-            vec![
-                ratatui::text::Line::from(
-                    vec![
-                        "Hello World!".into()
-                    ]
-                )
-            ]
-        );
-        
-        widgets::Paragraph::new(text)
-            .centered()
-            .block(block)
-            .render(area, buf);
     }
 }
 
 
+
+
 impl ratatui::widgets::Widget for &App
-{    
+{
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     {  
         // TODO: Have the match create a block item that we display
@@ -163,3 +223,4 @@ impl ratatui::widgets::Widget for &App
     }
 }
 
+*/
