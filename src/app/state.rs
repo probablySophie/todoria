@@ -38,7 +38,7 @@ impl State
     }
 }
 
-impl crate::app::App
+impl crate::app::App<'_>
 {
     
     /// Update the app's `self.state`, also sets `self.previous_state`
@@ -47,7 +47,7 @@ impl crate::app::App
         self.previous_state = self.state;
         self.state = state;
 
-        self.instructions = ratatui::text::Line::from(match state
+        self.screens.update_instructions(ratatui::text::Line::from(match state
         {
             State::Main => {
                 vec![
@@ -56,7 +56,9 @@ impl crate::app::App
                     char_from_action(&self.keybinds, Action::Quit, State::Main).blue().bold(),
                     " Select: ".into(),
                     char_from_action(&self.keybinds, Action::Select, State::Main).blue().bold(),
-                    " ".into(),
+                    " Save: ".into(),
+                    char_from_action(&self.keybinds, Action::Save, State::Main).blue().bold(),
+                    " ".into(), // Keep me last in this vec
                 ]            
             },
             
@@ -66,6 +68,6 @@ impl crate::app::App
             | State::Filter
             | State::Sort
             | State::All => { vec![ "No Instructions Yet :(".red().bold() ] }
-        });        
+        }));        
     }
 }
