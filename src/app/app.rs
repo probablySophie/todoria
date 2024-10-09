@@ -12,7 +12,7 @@ use super::keybinds;
 
 
 #[derive(Debug)]
-pub struct App
+pub struct App<'a>
 {
     title: &'static str,
     exit: bool,
@@ -23,16 +23,17 @@ pub struct App
     
     keybinds: Vec<keybinds::KeyBind>, // [[keybinds.rs]]
     
-    current_view: Vec<Todo>,
     loaded_todos: Vec<Todo>,          // [[todos.rs]]
     
     settings: settings::Settings,     // [[settings.rs]]
     debug_info: String,               // Printed if crate::DEBUG is true
 
-    instructions: ratatui::text::Line<'static> // The instructions & keybinds to display
+    instructions: ratatui::text::Line<'a>, // The instructions & keybinds to display
+
+    screens: render::Screens<'a>,
 }
 
-impl Default for App
+impl<'a> Default for App<'a>
 {
     fn default() -> Self
     {
@@ -44,17 +45,17 @@ impl Default for App
             state: State::Main,
             previous_state: State::Main,
             keybinds: keybinds::default_vec(),
-            current_view: Vec::new(),
             loaded_todos: Vec::new(),
             settings: settings::Settings::default(),
             debug_info: String::new(),
             instructions: ratatui::text::Line::from(""),
+            screens: render::Screens::new(crate::TITLE),
         }
     }
 }
 
 
-impl App
+impl App<'_>
 {
     /// Our App's main while loop that draws, handles, events, & quits when done
     pub fn run(&mut self, mut terminal: ratatui::DefaultTerminal) -> io::Result<String>
@@ -64,7 +65,8 @@ impl App
         
     	while !self.exit
     	{
-    		terminal.draw(|frame| {self.draw(frame)})?;
+    		terminal.draw(|frame| {self.screens.render(frame, self.state)})?;
+    		
             self.handle_events()?;
     	}
 
@@ -99,18 +101,16 @@ impl App
                 self.loaded_todos = loaded;
             }
         }
+        if ! self.loaded_todos.is_empty()
+        {
+            self.screens.todo_table.build_rows(self.loaded_todos.clone());
+        }
 
         if crate::DEBUG
         {
             self.debug_info += "loaded '";
             self.debug_info += &(self.loaded_todos.len().to_string() + "' Todo items");
         }
-    }
-
-    fn draw(&self, frame: &mut ratatui::Frame)
-    {
-        // TODO: match self.state
-        frame.render_widget(self, frame.area());
     }
 
     /// Handle input events
@@ -142,13 +142,17 @@ impl App
     /// Do whatever action we've got
     fn do_the_thing(&mut self, action: Action)
     {
-        match action
+        match (action, self.state)
         {
-            Action::None => { /* Do nothing :) */ },
-            Action::Quit => self.exit(),
-            Action::Close => self.change_state(State::Main),
-            Action::Save => self.save(),
-            Action::Select => self.change_state(State::All), //TEMP
+            (Action::None,   _) => { /* Do nothing :) */ },
+            (Action::Quit,   _) => self.exit(),
+            (Action::Close,  _) => self.change_state(State::Main),
+            (Action::Save,   _) => self.save(),
+            (Action::Select, _) => self.change_state(State::All), //TEMP
+            (Action::Up,
+                   State::Main) => self.screens.todo_table.up(),
+            (Action::Down,
+                   State::Main) => self.screens.todo_table.down(),
             _ => { todo!() },
         }
     }
