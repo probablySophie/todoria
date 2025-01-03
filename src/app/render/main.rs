@@ -1,8 +1,8 @@
-use ratatui::{style::Stylize, text::Line, widgets::{self, block::Title, Block}, Frame};
+use ratatui::{style::{Style, Stylize}, text::Line, widgets::{self, block::Title, Block}, Frame};
 
 use crate::app::State;
 
-use super::{hello_world::HelloWorld, table::TableContainer};
+use super::{focused::Focused, hello_world::HelloWorld, table::TableContainer};
 
 #[derive(Debug)]
 pub struct Screens<'a>
@@ -12,19 +12,19 @@ pub struct Screens<'a>
     
     pub todo_table: TableContainer<'a>,
     pub hello_world: HelloWorld<'a>,
+    pub focused: Focused<'a>
 }
 impl<'a> Screens<'a>
 {
-    pub fn new(title: &str) -> Self
-    {
-        let title = widgets::block::Title::from(title.to_owned().bold());
-                
+    pub fn new() -> Self
+    {                
         let block = Self::block( Title::from("") );        
         Screens
         {
             block,
             todo_table: TableContainer::new(),
             hello_world: HelloWorld::new("Hello World!"),
+            focused: Focused::new(),
         }
     }
 
@@ -38,8 +38,8 @@ impl<'a> Screens<'a>
                 .alignment(ratatui::layout::Alignment::Center)
                 .position(widgets::block::Position::Bottom)
             )
+            .border_style(Style::new().fg(ratatui::style::Color::Indexed(165)))
             .border_set(ratatui::symbols::border::ROUNDED)
-            //.style(Style::new().blue())
     }
 
     pub fn update_instructions(&mut self, instructions: Line<'a>)

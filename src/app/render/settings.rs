@@ -17,3 +17,13 @@
 	TODO: A calendar popup for selecting sorting dates? (and date ranges)
 */
 
+/* Examples
+	           |
+	Tabs       | https://ratatui.rs/examples/widgets/tabs/
+	           |
+	User Input | https://ratatui.rs/examples/apps/user_input/
+	Popup      | https://ratatui.rs/examples/apps/popup/
+	Layout     | https://ratatui.rs/examples/apps/demo/
+	Layout E.g | https://ratatui.rs/examples/layout/
+*/
+

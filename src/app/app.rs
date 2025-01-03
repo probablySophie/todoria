@@ -10,7 +10,7 @@ use super::keybinds;
 #[path = "action.rs"]       mod action  ; pub use action::Action;
 #[path = "settings.rs"]     mod settings;
 
-
+// TODO: This declaration will probably need to be turned into a Macro so that main.rs can add non-generic items like loaded_todos
 #[derive(Debug)]
 pub struct App<'a>
 {
@@ -25,8 +25,8 @@ pub struct App<'a>
     
     loaded_todos: Vec<Todo>,          // [[todos.rs]]
     
-    settings: settings::Settings,     // [[settings.rs]]
-    debug_info: String,               // Printed if crate::DEBUG is true
+    pub settings: settings::Settings,     // [[settings.rs]]
+    pub debug_info: String,               // Printed if crate::DEBUG is true
 
     instructions: ratatui::text::Line<'a>, // The instructions & keybinds to display
 
@@ -49,7 +49,7 @@ impl<'a> Default for App<'a>
             settings: settings::Settings::default(),
             debug_info: String::new(),
             instructions: ratatui::text::Line::from(""),
-            screens: render::Screens::new(crate::TITLE),
+            screens: render::Screens::new(),
         }
     }
 }
@@ -60,16 +60,25 @@ impl App<'_>
     /// Our App's main while loop that draws, handles, events, & quits when done
     pub fn run(&mut self, mut terminal: ratatui::DefaultTerminal) -> io::Result<String>
     {
+        self.on_load();
         self.setup();
         self.change_state(State::Main);
-        
-    	while !self.exit
-    	{
+
+        // Main loop!
+        loop
+        {
+            // Should we exit?
+            if self.exit
+            {
+                self.before_quit();
+                // Double check we still should exit
+                if self.exit { break };
+            }
     		terminal.draw(|frame| {self.screens.render(frame, self.state)})?;
     		
             self.handle_events()?;
-    	}
-
+        }
+        
     	Ok (self.debug_info.clone()) // Return Ok(())
     }
 
@@ -86,31 +95,6 @@ impl App<'_>
             self.debug_info += "Failed to load settings\n";
         }
         // Else we'll get the default settings
-        
-        // If we're saving multiple files
-        if self.settings.save_seperate_by_project
-        {
-            // Load multiple files
-            self.loaded_todos = crate::app::todos::load_all(&self.settings.save_path);
-        }
-        else // Else
-        {
-            // Just load one file thank you
-            if let Ok(loaded) = crate::app::todos::load(&self.settings.save_path)
-            {
-                self.loaded_todos = loaded;
-            }
-        }
-        if ! self.loaded_todos.is_empty()
-        {
-            self.screens.todo_table.build_rows(self.loaded_todos.clone());
-        }
-
-        if crate::DEBUG
-        {
-            self.debug_info += "loaded '";
-            self.debug_info += &(self.loaded_todos.len().to_string() + "' Todo items");
-        }
     }
 
     /// Handle input events
@@ -148,7 +132,8 @@ impl App<'_>
             (Action::Quit,   _) => self.exit(),
             (Action::Close,  _) => self.change_state(State::Main),
             (Action::Save,   _) => self.save(),
-            (Action::Select, _) => self.change_state(State::All), //TEMP
+            (Action::Select | Action::New, _) 
+                                => self.change_state(State::Focused),
             (Action::Up,
                    State::Main) => self.screens.todo_table.up(),
             (Action::Down,
@@ -157,19 +142,9 @@ impl App<'_>
         }
     }
 
-    /// Either set `self.exit` to true or change state to `State::UnsavedChanges`
-    /// Depending on whether or not there are unsaved changes
-    fn exit(&mut self)
+    pub fn exit(&mut self)
     {
-        // Don't quit if there's unsaved changes
-        if self.unsaved_changes
-        {
-            self.change_state(State::UnsavedChanges);
-        }
-        else
-        {
-            self.exit = true;
-        }
+        self.exit = true
     }
 
     /// Attempt to save all our loaded todo items
@@ -180,14 +155,14 @@ impl App<'_>
             {
                 crate::app::todos::save_seperate(
                     &self.settings.save_path, 
-                    self.loaded_todos.clone()
+                    &self.loaded_todos
                 )
             }
             else
             {
                 crate::app::todos::save(
                     &self.settings.save_path, 
-                    self.loaded_todos.clone()
+                    &self.loaded_todos
                 )
             };
 

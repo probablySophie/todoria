@@ -3,5 +3,6 @@
 mod app;
 pub use app::*;
 
-mod keybinds;
+#[macro_use]
+pub mod keybinds;
 mod todos;

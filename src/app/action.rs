@@ -14,6 +14,8 @@ pub enum Action
     Select, // Select the currently hovered item
     Close,  // Close any popups or go back to the main display
     Save,
+    
+    New, // Make a new item
 }
 
 
@@ -34,6 +36,7 @@ impl Action
 			"RIGHT"  => Ok(Action::Right),
 			"SELECT" => Ok(Action::Select),
 			"CLOSE"  => Ok(Action::Close),
+			"NEW"    => Ok(Action::New),
 			_ => Err(
 				std::io::Error::new (
 					std::io::ErrorKind::NotFound,

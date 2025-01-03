@@ -1,4 +1,4 @@
-use ratatui::{buffer::Buffer, layout::{Constraint, Rect}, style::{Style, Stylize}, widgets::{Block, Cell, Row, Table, TableState, Widget}, Frame};
+use ratatui::{layout::Constraint, style::{Style, Stylize}, widgets::{Block, Cell, Row, Table, TableState}, Frame};
 use todo_txt_rs::Todo;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -224,7 +224,7 @@ impl<'a> TableContainer<'a>
 		self.table = Table::new(self.as_table_rows(), self.display.widths())
 				.column_spacing(3) // TODO: Have this number depend on self.display.density
 				.style(Style::new())
-				.highlight_style(Style::new().reversed().bold());
+				.highlight_style(Style::new().reversed().bold().fg(ratatui::style::Color::Indexed(165)));
 	}
 
 	/// Render the table!

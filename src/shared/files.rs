@@ -59,6 +59,14 @@ pub fn write(file_path: &str, contents: &str) -> bool
 
 pub fn recursive_mkdir(file_path: &str) -> bool
 {
+	let folder_seperator_char = if cfg!(windows) {"\\"} else {"/"};
+
+	// TODO: Split file_path by folder_seperator_char
+	// TODO: For each split item
+	//			* Check if current_file_path/ the folder is there
+	//          * Attempt to make the folder if no
+	//          * Either way, attach the folder to the current_file_path
+	
 	// TODO: recursive_mkdir
 	false
 }

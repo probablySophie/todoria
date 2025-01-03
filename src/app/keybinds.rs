@@ -108,6 +108,18 @@ pub fn char_from_action(keybinds: &Vec<KeyBind>, action: Action, state: State) -
 	String::new() // Return ""
 }
 
+macro_rules! DefaultKeybinds {
+    ( $($keycode:expr, $action:expr, $required_state:expr,)+ ) => 
+    {
+    	pub fn default_keys() -> Vec<KeyBind>
+    	{
+    		vec![
+    			$( KeyBind::new( $keycode, $action, $required_state ), )+
+    		]
+    	}
+    };
+}
+
 pub fn default_vec() -> Vec<KeyBind>
 {
 	// TODO: Make it possible to overwrite some of these keybinds with
@@ -142,6 +154,11 @@ pub fn default_vec() -> Vec<KeyBind>
         	crossterm::event::KeyCode::Enter,
         	Action::Select,
         	State::All,
+        ),
+        KeyBind::new(
+        	crossterm::event::KeyCode::Char('N'),
+        	Action::New,
+        	State::Main	
         ),
         KeyBind::new(
         	crossterm::event::KeyCode::Esc,

@@ -38,14 +38,39 @@ pub fn load_all(file_path: &str) -> Vec<Todo>
 	vec_todo
 }
 
-pub fn save(file_path: &str, todo_vec: Vec<Todo>) -> bool
+pub fn save(file_path: &str, todo_vec: &Vec<Todo>) -> bool
 {
 	//TODO: Call files::recursive_mkdir();
 
-	files::write(file_path, &todo_txt_rs::flatten_vec(todo_vec))
+	files::write(file_path, &todo_txt_rs::flatten_vec(&todo_vec))
 }
 
-pub fn save_seperate(directory_path: &str, todo_vec: Vec<Todo>) -> bool
+/// Save all Todo items to seperate files depending on a list of projects
+pub fn save_specified(directory_path: &str, todo_vec: &Vec<Todo>, projects_to_save: Vec<String>) -> bool
+{
+	//TODO: Call files::recursive_mkdir();
+	let directory_path = files::safe_directory(directory_path);
+	
+	let mut success = true;
+
+	for project in projects_to_save
+	{
+		let save_vec = todo_txt_rs::filter::project(&todo_vec, &project);
+
+		// Set success to false if:
+		//     Success was already false
+		//     We failed to save this set of Todo items
+		success = success && files::write(
+			&( (directory_path.clone() + &project) + ".txt"),
+			&todo_txt_rs::flatten_vec(&save_vec)
+		);
+	}
+
+	success
+}
+
+/// Save all Todo items to seperate files depending on their projects
+pub fn save_seperate(directory_path: &str, todo_vec: &Vec<Todo>) -> bool
 {
 	//TODO: Call files::recursive_mkdir();
 	let directory_path = files::safe_directory(directory_path);
@@ -62,7 +87,7 @@ pub fn save_seperate(directory_path: &str, todo_vec: Vec<Todo>) -> bool
 		//     We failed to save this set of Todo items
 		success = success && files::write(
 			&( (directory_path.clone() + &project) + ".txt"),
-			&todo_txt_rs::flatten_vec(save_vec)
+			&todo_txt_rs::flatten_vec(&save_vec)
 		);
 	}
 
